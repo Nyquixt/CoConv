@@ -7,7 +7,7 @@ __all__ = ['CoConv_AlexNet']
 
 class CoConv_AlexNet(nn.Module):
 
-    def __init__(self, num_classes=100, num_experts=3, mode='in'):
+    def __init__(self, num_classes=100, num_experts=3):
         super().__init__()
         self.features = nn.Sequential(
             CoConv(3, 64, kernel_size=3, stride=2, padding=1, num_experts=num_experts),

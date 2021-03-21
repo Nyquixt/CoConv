@@ -98,19 +98,12 @@ def get_network(network, dataset, device):
             from tiny.dycnn_resnet import Dy_ResNet18
         net = Dy_ResNet18(num_experts=int( network[5] ))
 
-    elif network.startswith('coconvin') and network.endswith('resnet18'):
+    elif network.startswith('coconv') and network.endswith('resnet18'):
         if dataset == 'cifar100':
-            from cifar.coconv_resnet import DDS_ResNet18
+            from cifar.coconv_resnet import CoConv_ResNet18
         elif dataset == 'tiny':
-            from tiny.coconv_resnet import DDS_ResNet18
-        net = DDS_ResNet18(num_experts=int( network[8] ), mode='in')
-
-    elif network.startswith('coconvout') and network.endswith('resnet18'):
-        if dataset == 'cifar100':
-            from cifar.coconv_resnet import DDS_ResNet18
-        elif dataset == 'tiny':
-            from tiny.coconv_resnet import DDS_ResNet18
-        net = DDS_ResNet18(num_experts=int( network[9] ), mode='out')
+            from tiny.coconv_resnet import CoConv_ResNet18
+        net = CoConv_ResNet18(num_experts=int( network[6] ))
     
     # AlexNet and Related Work
     elif network.startswith('cc') and network.endswith('alexnet'):
@@ -127,19 +120,12 @@ def get_network(network, dataset, device):
             from tiny.dycnn_alexnet import Dy_AlexNet
         net = Dy_AlexNet(num_experts=int( network[5] ))
     
-    elif network.startswith('coconvin') and network.endswith('alexnet'):
+    elif network.startswith('coconv') and network.endswith('alexnet'):
         if dataset == 'cifar100':
-            from cifar.coconv_alexnet import DDS_AlexNet
+            from cifar.coconv_alexnet import CoConv_AlexNet
         elif dataset == 'tiny':
-            from tiny.coconv_alexnet import DDS_AlexNet
-        net = DDS_AlexNet(num_experts=int( network[8] ), mode='in')
-
-    elif network.startswith('coconvout') and network.endswith('alexnet'):
-        if dataset == 'cifar100':
-            from cifar.coconv_alexnet import DDS_AlexNet
-        elif dataset == 'tiny':
-            from tiny.coconv_alexnet import DDS_AlexNet
-        net = DDS_AlexNet(num_experts=int( network[9] ), mode='out')
+            from tiny.coconv_alexnet import CoConv_AlexNet
+        net = CoConv_AlexNet(num_experts=int( network[6] ))
 
     #MobileNetV2 and Related Work   
     elif network.startswith('cc') and network.endswith('mobilenetv2'):
@@ -155,19 +141,12 @@ def get_network(network, dataset, device):
             from tiny.dycnn_mobilenetv2 import Dy_MobileNetV2
         net = Dy_MobileNetV2(num_experts=int( network[5] ))
 
-    elif network.startswith('coconvin') and network.endswith('mobilenetv2'):
+    elif network.startswith('coconv') and network.endswith('mobilenetv2'):
         if dataset == 'cifar100':
-            from cifar.coconv_mobilenetv2 import DDS_MobileNetV2
+            from cifar.coconv_mobilenetv2 import CoConv_MobileNetV2
         elif dataset == 'tiny':
-            from tiny.coconv_mobilenetv2 import DDS_MobileNetV2
-        net = DDS_MobileNetV2(num_experts=int( network[8] ), mode='in')
-
-    elif network.startswith('coconvout') and network.endswith('mobilenetv2'):
-        if dataset == 'cifar100':
-            from cifar.coconv_mobilenetv2 import DDS_MobileNetV2
-        elif dataset == 'tiny':
-            from tiny.coconv_mobilenetv2 import DDS_MobileNetV2
-        net = DDS_MobileNetV2(num_experts=int( network[9] ), mode='out')
+            from tiny.coconv_mobilenetv2 import CoConv_MobileNetV2
+        net = CoConv_MobileNetV2(num_experts=int( network[6] ))
         
     else:
         print('the network is not supported')

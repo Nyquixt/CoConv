@@ -33,6 +33,30 @@ class route_func(nn.Module):
         attention = self.sigmoid(self.dwise_separable(attention))
         return attention
 
+class route_func_single_scale(nn.Module):
+    def __init__(self, in_channels, out_channels, num_experts=3, reduction=16):
+        super().__init__()
+        # Global Average Pool
+        self.gap1 = nn.AdaptiveAvgPool2d(1)
+
+        squeeze_channels = max(in_channels // reduction, reduction)
+        
+        self.dwise_separable = nn.Sequential(
+            nn.Conv2d(in_channels, squeeze_channels, kernel_size=1, stride=1, groups=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(squeeze_channels, squeeze_channels, kernel_size=1, stride=1, groups=squeeze_channels, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(squeeze_channels, num_experts * out_channels, kernel_size=1, stride=1, groups=1, bias=False)
+        )
+        
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        b, _, _, _ = x.size()
+        a1 = self.gap1(x)
+        attention = self.sigmoid(self.dwise_separable(a1))
+        return attention
+
 class CoConv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=False):
         super().__init__()
@@ -46,7 +70,7 @@ class CoConv(nn.Module):
         self.groups = groups
 
         # routing function
-        self.routing_func = route_func(in_channels, out_channels, num_experts, reduction)
+        self.routing_func = route_func_single_scale(in_channels, out_channels, num_experts, reduction)
 
         # convs
         if deploy:
