@@ -12,7 +12,7 @@ class BasicBlock(nn.Module):
         super().__init__()
         self.conv1 = CoConv(in_channels, channels, kernel_size=3, stride=stride, padding=1, num_experts=num_experts)
         self.bn1 = nn.BatchNorm2d(channels)
-        self.conv2 = Cooself.conv1 = CoConv(channels, channels, kernel_size=3, stride=1, padding=1, num_experts=num_experts)
+        self.conv2 = CoConv(channels, channels, kernel_size=3, stride=1, padding=1, num_experts=num_experts)
         self.bn2 = nn.BatchNorm2d(channels)
         
         self.shortcut = nn.Sequential()
