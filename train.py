@@ -46,7 +46,8 @@ trainloader, testloader = get_dataloader(dataset=cfg['misc']['dataset'], batch_s
 # Get network
 net = get_network(network=network_name, 
                 dataset=cfg['misc']['dataset'], 
-                device=device)
+                device=device,
+                activation=cfg['model']['routing_activation'])
 
 # Handle multi-gpu
 if cfg['misc']['cuda'] and cfg['misc']['ngpu'] > 1:
