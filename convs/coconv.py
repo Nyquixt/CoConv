@@ -6,7 +6,7 @@ import math
 __all__ = ['CoConv']
 
 class route_func(nn.Module):
-    def __init__(self, in_channels, out_channels, num_experts=3, reduction=16):
+    def __init__(self, in_channels, out_channels, num_experts=3, reduction=16, activation='sigmoid'):
         super().__init__()
         # Global Average Pool
         self.gap1 = nn.AdaptiveAvgPool2d(1)
@@ -21,8 +21,11 @@ class route_func(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(squeeze_channels, num_experts * out_channels, kernel_size=1, stride=1, groups=1, bias=False)
         )
-        
-        self.sigmoid = nn.Sigmoid()
+        if activation == 'sigmoid':
+            self.activation = nn.Sigmoid()
+        elif activation == 'softmax':
+            self.temperature = 30
+            self.activation = nn.Softmax(1)
 
     def forward(self, x):
         b, _, _, _ = x.size()
@@ -30,7 +33,7 @@ class route_func(nn.Module):
         a3 = self.gap3(x)
         a1 = a1.expand_as(a3)
         attention = torch.cat([a1, a3], dim=1)
-        attention = self.sigmoid(self.dwise_separable(attention))
+        attention = self.activation(self.dwise_separable(attention))
         return attention
 
 class route_func_single_scale(nn.Module):
@@ -70,7 +73,7 @@ class CoConv(nn.Module):
         self.groups = groups
 
         # routing function
-        self.routing_func = route_func_single_scale(in_channels, out_channels, num_experts, reduction)
+        self.routing_func = route_func(in_channels, out_channels, num_experts, reduction)
 
         # convs
         if deploy:
