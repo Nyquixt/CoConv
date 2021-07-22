@@ -23,8 +23,8 @@ class route_func(nn.Module):
         )
         if activation == 'sigmoid':
             self.activation = nn.Sigmoid()
-        elif activation == 'softmax':
-            self.temperature = 30
+        else:
+            # self.temperature = 30
             self.activation = nn.Softmax(1)
 
     def forward(self, x):
