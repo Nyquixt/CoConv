@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from convs.condconv import *
 
-__all__ = ['CC_MobileNetV2']
+__all__ = ['CondConv_MobileNetV2']
 
 class Block(nn.Module):
     '''expand + depthwise + pointwise'''
@@ -38,7 +38,7 @@ class Block(nn.Module):
         return out
 
 
-class CC_MobileNetV2(nn.Module):
+class CondConv_MobileNetV2(nn.Module):
     # (expansion, out_planes, num_blocks, stride)
     cfg = [(1,  16, 1, 1),
            (6,  24, 2, 1),  # NOTE: change stride to 1 for CIFAR10, to 2 for TinyImageNet
@@ -49,7 +49,7 @@ class CC_MobileNetV2(nn.Module):
            (6, 320, 1, 1)]
 
     def __init__(self, num_classes=200, num_experts=3):
-        super(CC_MobileNetV2, self).__init__()
+        super(CondConv_MobileNetV2, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(32)
@@ -79,7 +79,7 @@ class CC_MobileNetV2(nn.Module):
 
 
 def test():
-    net = CC_MobileNetV2(num_classes=100)
+    net = CondConv_MobileNetV2(num_classes=100)
     x = torch.randn(2,3,32,32)
     y = net(x)
     print(y.size())

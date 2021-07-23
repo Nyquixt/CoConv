@@ -3,9 +3,9 @@ import torch.nn as nn
 
 from convs.condconv import *
 
-__all__ = ['CC_AlexNet']
+__all__ = ['CondConv_AlexNet']
 
-class CC_AlexNet(nn.Module):
+class CondConv_AlexNet(nn.Module):
 
     def __init__(self, num_classes=100, num_experts=3):
         super().__init__()

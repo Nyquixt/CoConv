@@ -86,10 +86,10 @@ def get_network(network, dataset, device, activation='sigmoid'):
     # ResNet18 and Related Work
     if network.startswith('cc') and network.endswith('resnet18'):
         if dataset == 'cifar100':
-            from cifar.condconv_resnet import CC_ResNet18
+            from cifar.condconv_resnet import CondConv_ResNet18
         elif dataset == 'tiny':
-            from tiny.condconv_resnet import CC_ResNet18
-        net = CC_ResNet18(num_experts=int( network[2] ))
+            from tiny.condconv_resnet import CondConv_ResNet18
+        net = CondConv_ResNet18(num_experts=int( network[2] ))
 
     elif network.startswith('dycnn') and network.endswith('resnet18'):
         if dataset == 'cifar100':
@@ -108,10 +108,10 @@ def get_network(network, dataset, device, activation='sigmoid'):
     # AlexNet and Related Work
     elif network.startswith('cc') and network.endswith('alexnet'):
         if dataset == 'cifar100':
-            from cifar.condconv_alexnet import CC_AlexNet
+            from cifar.condconv_alexnet import CondConv_AlexNet
         elif dataset == 'tiny':
-            from tiny.condconv_alexnet import CC_AlexNet
-        net = CC_AlexNet(num_experts=int( network[2] ))
+            from tiny.condconv_alexnet import CondConv_AlexNet
+        net = CondConv_AlexNet(num_experts=int( network[2] ))
 
     elif network.startswith('dycnn') and network.endswith('alexnet'):
         if dataset == 'cifar100':
@@ -130,9 +130,10 @@ def get_network(network, dataset, device, activation='sigmoid'):
     # MobileNetV2 and Related Work   
     elif network.startswith('cc') and network.endswith('mobilenetv2'):
         if dataset == 'cifar100':
-            from cifar.condconv_mobilenetv2 import CC_MobileNetV2
+            from cifar.condconv_mobilenetv2 import CondConv_MobileNetV2
         elif dataset == 'tiny':
-            from tiny.condconv_mobilenetv2 import CC_MobileNetV2
+            from tiny.condconv_mobilenetv2 import CondConv_MobileNetV2
+        net = CondConv_MobileNetV2(num_experts=int( network[2] ))
 
     elif network.startswith('dycnn') and network.endswith('mobilenetv2'):
         if dataset == 'cifar100':

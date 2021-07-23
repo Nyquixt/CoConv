@@ -2,8 +2,6 @@
     Used to train models on CIFAR-100 and Tiny ImageNet
 '''
 import torch
-import torchvision
-import torchvision.transforms as transforms
 import torch.nn as nn
 
 import yaml

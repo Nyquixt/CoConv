@@ -22,6 +22,3 @@ track:
   save: true
   resume: false
   resume_path: ""
-
-file:
-  log: ""

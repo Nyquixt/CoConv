@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from convs.condconv import *
 
-__all__ = ['CC_ResNet18']
+__all__ = ['CondConv_ResNet18']
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -31,7 +31,7 @@ class BasicBlock(nn.Module):
         out = F.relu(out)
         return out
 
-class CC_ResNet(nn.Module):
+class CondConv_ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=200, num_experts=3):
         super().__init__()
         self.in_channels = 64
@@ -64,12 +64,12 @@ class CC_ResNet(nn.Module):
         out = self.linear(out)
         return out
 
-def CC_ResNet18(num_experts=3):
+def CondConv_ResNet18(num_experts=3):
     return CC_ResNet(BasicBlock, [2, 2, 2, 2], num_experts=num_experts)
 
 def test():
     x = torch.randn(128, 3, 64, 64)
-    net1 = CC_ResNet18()
+    net1 = CondConv_ResNet18()
     y1 = net1(x); print(y1.size())
     
 # test()
