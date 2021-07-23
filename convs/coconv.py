@@ -61,7 +61,7 @@ class route_func_single_scale(nn.Module):
         return attention
 
 class CoConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=False):
+    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=True, activation='sigmoid'):
         super().__init__()
         self.deploy = deploy
         self.num_experts = num_experts
@@ -73,14 +73,11 @@ class CoConv(nn.Module):
         self.groups = groups
 
         # routing function
-        self.routing_func = route_func(in_channels, out_channels, num_experts, reduction)
+        self.routing_func = route_func(in_channels, out_channels, num_experts, reduction, activation)
 
         # convs
-        if deploy:
-            self.kernel_size = kernel_size
-            self.convs = nn.Parameter(torch.Tensor(num_experts, out_channels, in_channels, kernel_size, kernel_size)) # to count parameters during inference
-            nn.init.kaiming_uniform_(self.convs, a=math.sqrt(5))
-
+        if deploy: # for the purpose of testing inference time only. loading state_dict is not implemented
+            self.convs = [nn.Parameter(torch.Tensor(out_channels, in_channels // groups, kernel_size, kernel_size)) for i in range(num_experts)]
             if bias:
                 self.bias = nn.Parameter(torch.Tensor(num_experts, out_channels))
             else:
@@ -93,21 +90,19 @@ class CoConv(nn.Module):
         routing_weight = self.routing_func(x) # N x k*C
         if self.deploy:
             routing_weight = self.routing_func(x) # N x k*C
-            routing_weight = routing_weight.view(-1, self.num_experts, self.out_channels).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-            b, c_in, h, w = x.size()
-            x = x.view(1, -1, h, w)
-            weight = self.convs.unsqueeze(0)
-            combined_weight = (weight * routing_weight).view(self.num_experts, b*self.out_channels, c_in, self.kernel_size, self.kernel_size)
-            combined_weight = torch.sum(combined_weight, dim=0)
+            combined_weight = torch.zeros(*self.convs[0].size())
+            for i in range(self.num_experts):
+                route = torch.sum(routing_weight[:, i * self.out_channels : (i+1) * self.out_channels], dim=0)
+                combined_weight += self.convs[i] * route.unsqueeze(-1).expand_as(self.convs[i])
+            
             if self.bias is not None:
                 combined_bias = routing_weight.squeeze(-1).squeeze(-1).squeeze(-1).view(-1, self.num_experts * self.out_channels) * self.bias.view(-1).unsqueeze(0)
                 combined_bias = combined_bias.sum(1)
                 output = F.conv2d(x, weight=combined_weight, 
-                                stride=self.stride, padding=self.padding, groups=self.groups * b)
+                                stride=self.stride, padding=self.padding, groups=self.groups)
             else:
                 output = F.conv2d(x, weight=combined_weight,
-                                stride=self.stride, padding=self.padding, groups=self.groups * b)
-            output = output.view(b, self.out_channels, output.size(-2), output.size(-1))
+                                stride=self.stride, padding=self.padding, groups=self.groups)
         else:
             outputs = []
             for i in range(self.num_experts):
