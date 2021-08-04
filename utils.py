@@ -9,7 +9,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import time
 
 from config import *
@@ -81,73 +81,76 @@ def accuracy(output, target, topk=(1,5)):
             res.append(correct_k.mul(100.0/batch_size))
         return res
 
-def get_network(network, dataset, device, activation='sigmoid'):
+def get_network(model_type, num_experts, backbone, dataset, device, activation='sigmoid'):
 
     # ResNet18 and Related Work
-    if network.startswith('cc') and network.endswith('resnet18'):
-        if dataset == 'cifar100':
-            from cifar.condconv_resnet import CondConv_ResNet18
-        elif dataset == 'tiny':
-            from tiny.condconv_resnet import CondConv_ResNet18
-        net = CondConv_ResNet18(num_experts=int( network[2] ))
+    if backbone == 'resnet18':
+        if model_type == 'cc':
+            if dataset == 'cifar100':
+                from cifar.condconv_resnet import CondConv_ResNet18
+            elif dataset == 'tiny':
+                from tiny.condconv_resnet import CondConv_ResNet18
+            net = CondConv_ResNet18(num_experts=num_experts)
 
-    elif network.startswith('dycnn') and network.endswith('resnet18'):
-        if dataset == 'cifar100':
-            from cifar.dycnn_resnet import Dy_ResNet18
-        elif dataset == 'tiny':
-            from tiny.dycnn_resnet import Dy_ResNet18
-        net = Dy_ResNet18(num_experts=int( network[5] ))
+        elif model_type == 'dycnn':
+            if dataset == 'cifar100':
+                from cifar.dycnn_resnet import Dy_ResNet18
+            elif dataset == 'tiny':
+                from tiny.dycnn_resnet import Dy_ResNet18
+            net = Dy_ResNet18(num_experts=num_experts)
 
-    elif network.startswith('coconv') and network.endswith('resnet18'):
-        if dataset == 'cifar100':
-            from cifar.coconv_resnet import CoConv_ResNet18
-        elif dataset == 'tiny':
-            from tiny.coconv_resnet import CoConv_ResNet18
-        net = CoConv_ResNet18(num_experts=int( network[6] ), activation=activation)
+        elif model_type == 'coconv':
+            if dataset == 'cifar100':
+                from cifar.coconv_resnet import CoConv_ResNet18
+            elif dataset == 'tiny':
+                from tiny.coconv_resnet import CoConv_ResNet18
+            net = CoConv_ResNet18(num_experts=num_experts, activation=activation)
     
     # AlexNet and Related Work
-    elif network.startswith('cc') and network.endswith('alexnet'):
-        if dataset == 'cifar100':
-            from cifar.condconv_alexnet import CondConv_AlexNet
-        elif dataset == 'tiny':
-            from tiny.condconv_alexnet import CondConv_AlexNet
-        net = CondConv_AlexNet(num_experts=int( network[2] ))
+    elif backbone == 'alexnet':
+        if model_type == 'cc':
+            if dataset == 'cifar100':
+                from cifar.condconv_alexnet import CondConv_AlexNet
+            elif dataset == 'tiny':
+                from tiny.condconv_alexnet import CondConv_AlexNet
+            net = CondConv_AlexNet(num_experts=num_experts)
 
-    elif network.startswith('dycnn') and network.endswith('alexnet'):
-        if dataset == 'cifar100':
-            from cifar.dycnn_alexnet import Dy_AlexNet
-        elif dataset == 'tiny':
-            from tiny.dycnn_alexnet import Dy_AlexNet
-        net = Dy_AlexNet(num_experts=int( network[5] ))
-    
-    elif network.startswith('coconv') and network.endswith('alexnet'):
-        if dataset == 'cifar100':
-            from cifar.coconv_alexnet import CoConv_AlexNet
-        elif dataset == 'tiny':
-            from tiny.coconv_alexnet import CoConv_AlexNet
-        net = CoConv_AlexNet(num_experts=int( network[6] ), activation=activation)
+        elif model_type == 'dycnn':
+            if dataset == 'cifar100':
+                from cifar.dycnn_alexnet import Dy_AlexNet
+            elif dataset == 'tiny':
+                from tiny.dycnn_alexnet import Dy_AlexNet
+            net = Dy_AlexNet(num_experts=num_experts)
+        
+        elif model_type == 'coconv':
+            if dataset == 'cifar100':
+                from cifar.coconv_alexnet import CoConv_AlexNet
+            elif dataset == 'tiny':
+                from tiny.coconv_alexnet import CoConv_AlexNet
+            net = CoConv_AlexNet(num_experts=num_experts, activation=activation)
 
-    # MobileNetV2 and Related Work   
-    elif network.startswith('cc') and network.endswith('mobilenetv2'):
-        if dataset == 'cifar100':
-            from cifar.condconv_mobilenetv2 import CondConv_MobileNetV2
-        elif dataset == 'tiny':
-            from tiny.condconv_mobilenetv2 import CondConv_MobileNetV2
-        net = CondConv_MobileNetV2(num_experts=int( network[2] ))
+    elif backbone == 'mobilenetv2':
+        # MobileNetV2 and Related Work   
+        if model_type == 'cc':
+            if dataset == 'cifar100':
+                from cifar.condconv_mobilenetv2 import CondConv_MobileNetV2
+            elif dataset == 'tiny':
+                from tiny.condconv_mobilenetv2 import CondConv_MobileNetV2
+            net = CondConv_MobileNetV2(num_experts=num_experts)
 
-    elif network.startswith('dycnn') and network.endswith('mobilenetv2'):
-        if dataset == 'cifar100':
-            from cifar.dycnn_mobilenetv2 import Dy_MobileNetV2
-        elif dataset == 'tiny':
-            from tiny.dycnn_mobilenetv2 import Dy_MobileNetV2
-        net = Dy_MobileNetV2(num_experts=int( network[5] ))
+        elif model_type == 'dycnn':
+            if dataset == 'cifar100':
+                from cifar.dycnn_mobilenetv2 import Dy_MobileNetV2
+            elif dataset == 'tiny':
+                from tiny.dycnn_mobilenetv2 import Dy_MobileNetV2
+            net = Dy_MobileNetV2(num_experts=num_experts)
 
-    elif network.startswith('coconv') and network.endswith('mobilenetv2'):
-        if dataset == 'cifar100':
-            from cifar.coconv_mobilenetv2 import CoConv_MobileNetV2
-        elif dataset == 'tiny':
-            from tiny.coconv_mobilenetv2 import CoConv_MobileNetV2
-        net = CoConv_MobileNetV2(num_experts=int( network[6] ), activation=activation)
+        elif model_type == 'coconv':
+            if dataset == 'cifar100':
+                from cifar.coconv_mobilenetv2 import CoConv_MobileNetV2
+            elif dataset == 'tiny':
+                from tiny.coconv_mobilenetv2 import CoConv_MobileNetV2
+            net = CoConv_MobileNetV2(num_experts=num_experts, activation=activation)
         
     else:
         print('the network is not supported')

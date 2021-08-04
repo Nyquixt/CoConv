@@ -1,8 +1,8 @@
 model:
-  type: "cc" # ['cc', 'dycnn', 'coconv']
-  name: "alexnet"
-  num_experts: 4
-  routing_activation: "softmax"
+  type: "coconv" # ['cc', 'dycnn', 'coconv']
+  name: "mobilenetv2"
+  num_experts: 2
+  routing_activation: "sigmoid"
 
 hyperparameters:
   epochs: 90
@@ -14,7 +14,7 @@ hyperparameters:
   weight_decay: 0.0005
 
 misc:
-  dataset: "tiny"
+  dataset: "cifar100"
   cuda: true
   ngpu: 2
 

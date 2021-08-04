@@ -21,10 +21,11 @@ with open(args.config, 'r') as f:
 network_name = cfg['model']['type'] + str(cfg['model']['num_experts']) + '_' + cfg['model']['name']
 # Files to record stuff to
 RESULT_FILE = 'results.txt'
-LOG_FILE = 'logs/{}-{}-b{}-e{}.txt'.format(network_name, 
+LOG_FILE = 'logs/{}-{}-b{}-e{}-{}.txt'.format(network_name, 
                                 cfg['misc']['dataset'], 
                                 cfg['hyperparameters']['batch'], 
-                                cfg['hyperparameters']['epochs'])
+                                cfg['hyperparameters']['epochs'],
+                                cfg['model']['routing_activation'])
 
 # Validation set length
 VAL_LEN = 10000
@@ -42,7 +43,9 @@ device = torch.device('cuda' if (torch.cuda.is_available() and cfg['misc']['cuda
 trainloader, testloader = get_dataloader(dataset=cfg['misc']['dataset'], batch_size=cfg['hyperparameters']['batch'])
 
 # Get network
-net = get_network(network=network_name, 
+net = get_network(model_type=cfg['model']['type'],
+                num_experts=cfg['model']['num_experts'],
+                backbone=cfg['model']['name'],
                 dataset=cfg['misc']['dataset'], 
                 device=device,
                 activation=cfg['model']['routing_activation'])

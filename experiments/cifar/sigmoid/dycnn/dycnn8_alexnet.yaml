@@ -1,8 +1,8 @@
 model:
-  type: "cc" # ['cc', 'dycnn', 'coconv']
-  name: "resnet18"
+  type: "dycnn" # ['cc', 'dycnn', 'coconv']
+  name: "alexnet"
   num_experts: 8
-  routing_activation: "softmax"
+  routing_activation: "sigmoid"
 
 hyperparameters:
   epochs: 90
