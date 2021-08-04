@@ -61,7 +61,7 @@ class route_func_single_scale(nn.Module):
         return attention
 
 class CoConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=True, activation='sigmoid'):
+    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=False, activation='sigmoid'):
         super().__init__()
         self.deploy = deploy
         self.num_experts = num_experts
