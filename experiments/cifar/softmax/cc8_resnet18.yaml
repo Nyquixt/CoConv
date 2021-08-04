@@ -14,7 +14,7 @@ hyperparameters:
   weight_decay: 0.0005
 
 misc:
-  dataset: "cifar"
+  dataset: "cifar100"
   cuda: true
   ngpu: 2
 
