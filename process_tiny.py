@@ -2,7 +2,9 @@ import os
 from shutil import copyfile
 
 '''
-    refactor tiny imagenet dataset in the val set
+    Tiny ImageNet URL: https://www.kaggle.com/c/tiny-imagenet
+    refactor tiny imagenet dataset in the val set;
+    there're some problems with it (e.g. NaN loss) if you don't run this file
 '''
 
 DIR = '/path/to/tiny-imagenet-200/folder'
