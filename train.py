@@ -133,7 +133,7 @@ for epoch in range(start_epoch, cfg['hyperparameters']['epochs']):  # Iterate ov
     if val_acc > stats['best_acc']:
         stats['best_acc'] = val_acc
         stats['best_epoch'] = epoch + 1
-        if cfg['trach']['save']:
+        if cfg['track']['save']:
             # Save the checkpoint
             state = {
                 'epoch': epoch, 
