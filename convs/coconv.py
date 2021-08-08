@@ -42,7 +42,7 @@ class route_func(nn.Module):
             attention = self.activation_func(self.dwise_separable(attention))
         else:
             attention = self.dwise_separable(attention).view(b, self.num_experts, self.out_channels)
-            attention = self.activation_func(attention).view(b, -1)
+            attention = self.activation_func(attention).view(b, -1, 1, 1)
         return attention
 
 class route_func_single_scale(nn.Module):
@@ -139,7 +139,7 @@ def test():
     conv = CoConv(16, 64, 3, padding=1, fuse_conv=True, bias=True)
     y = conv(x)
     print(y.shape)
-    conv = CoConv(16, 64, 3, padding=1, fuse_conv=True, bias=True, activation='softmax')
+    conv = CoConv(16, 64, 3, padding=1, fuse_conv=False, bias=True, activation='softmax')
     y = conv(x)
     print(y.shape)
 
