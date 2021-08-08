@@ -7,6 +7,11 @@ __all__ = ['CoConv']
 class route_func(nn.Module):
     def __init__(self, in_channels, out_channels, num_experts=3, reduction=16, activation='sigmoid'):
         super().__init__()
+
+        self.activation = activation
+        self.num_experts = num_experts
+        self.out_channels = out_channels
+
         # Global Average Pool
         self.gap1 = nn.AdaptiveAvgPool2d(1)
         self.gap3 = nn.AdaptiveAvgPool2d(3)
@@ -20,11 +25,12 @@ class route_func(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(squeeze_channels, num_experts * out_channels, kernel_size=1, stride=1, groups=1, bias=False)
         )
-        if activation == 'sigmoid':
-            self.activation = nn.Sigmoid()
+        
+        if self.activation == 'sigmoid':
+            self.activation_func = nn.Sigmoid()
         else:
             # self.temperature = 30
-            self.activation = nn.Softmax(1)
+            self.activation_func = nn.Softmax(1)
 
     def forward(self, x):
         b, _, _, _ = x.size()
@@ -32,7 +38,11 @@ class route_func(nn.Module):
         a3 = self.gap3(x)
         a1 = a1.expand_as(a3)
         attention = torch.cat([a1, a3], dim=1)
-        attention = self.activation(self.dwise_separable(attention))
+        if self.activation == 'sigmoid':
+            attention = self.activation_func(self.dwise_separable(attention))
+        else:
+            attention = self.dwise_separable(attention).view(b, self.num_experts, self.out_channels)
+            attention = self.activation_func(attention).view(b, -1)
         return attention
 
 class route_func_single_scale(nn.Module):
@@ -129,5 +139,8 @@ def test():
     conv = CoConv(16, 64, 3, padding=1, fuse_conv=True, bias=True)
     y = conv(x)
     print(y.shape)
+    conv = CoConv(16, 64, 3, padding=1, fuse_conv=True, bias=True, activation='softmax')
+    y = conv(x)
+    print(y.shape)
 
-# test()
+test()
