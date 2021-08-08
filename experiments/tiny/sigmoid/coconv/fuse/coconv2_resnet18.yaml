@@ -1,7 +1,8 @@
 model:
   type: "coconv" # ['cc', 'dycnn', 'coconv']
   name: "resnet18"
-  num_experts: 8
+  num_experts: 2
+  fuse_conv: true
   routing_activation: "sigmoid"
 
 hyperparameters:

@@ -81,7 +81,7 @@ def accuracy(output, target, topk=(1,5)):
             res.append(correct_k.mul(100.0/batch_size))
         return res
 
-def get_network(model_type, num_experts, backbone, dataset, device, activation='sigmoid'):
+def get_network(model_type, num_experts, backbone, dataset, device, fuse_conv=False, activation='sigmoid'):
 
     # ResNet18 and Related Work
     if backbone == 'resnet18':
@@ -104,7 +104,7 @@ def get_network(model_type, num_experts, backbone, dataset, device, activation='
                 from cifar.coconv_resnet import CoConv_ResNet18
             elif dataset == 'tiny':
                 from tiny.coconv_resnet import CoConv_ResNet18
-            net = CoConv_ResNet18(num_experts=num_experts, activation=activation)
+            net = CoConv_ResNet18(num_experts=num_experts, fuse_conv=fuse_conv, activation=activation)
     
     # AlexNet and Related Work
     elif backbone == 'alexnet':
@@ -127,7 +127,7 @@ def get_network(model_type, num_experts, backbone, dataset, device, activation='
                 from cifar.coconv_alexnet import CoConv_AlexNet
             elif dataset == 'tiny':
                 from tiny.coconv_alexnet import CoConv_AlexNet
-            net = CoConv_AlexNet(num_experts=num_experts, activation=activation)
+            net = CoConv_AlexNet(num_experts=num_experts, fuse_conv=fuse_conv, activation=activation)
 
     elif backbone == 'mobilenetv2':
         # MobileNetV2 and Related Work   
@@ -150,7 +150,7 @@ def get_network(model_type, num_experts, backbone, dataset, device, activation='
                 from cifar.coconv_mobilenetv2 import CoConv_MobileNetV2
             elif dataset == 'tiny':
                 from tiny.coconv_mobilenetv2 import CoConv_MobileNetV2
-            net = CoConv_MobileNetV2(num_experts=num_experts, activation=activation)
+            net = CoConv_MobileNetV2(num_experts=num_experts, fuse_conv=fuse_conv, activation=activation)
         
     else:
         print('the network is not supported')

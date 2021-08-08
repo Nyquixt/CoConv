@@ -18,14 +18,18 @@ args = parser.parse_args()
 with open(args.config, 'r') as f:
     cfg = yaml.full_load(f)
 
-network_name = cfg['model']['type'] + str(cfg['model']['num_experts']) + '_' + cfg['model']['name']
+if cfg['model']['fuse_conv'] == True:
+    network_name = cfg['model']['type'] + str(cfg['model']['num_experts']) + '_' + cfg['model']['name'] + '_fuse' 
+else:
+    network_name = cfg['model']['type'] + str(cfg['model']['num_experts']) + '_' + cfg['model']['name']
 # Files to record stuff to
 RESULT_FILE = 'results.txt'
-LOG_FILE = 'logs/{}-{}-b{}-e{}-{}.txt'.format(network_name, 
+LOG_FILE = 'logs/{}-{}-b{}-e{}-{}-{}.txt'.format(network_name, 
                                 cfg['misc']['dataset'], 
                                 cfg['hyperparameters']['batch'], 
                                 cfg['hyperparameters']['epochs'],
-                                cfg['model']['routing_activation'])
+                                cfg['model']['routing_activation'],
+                                'fuse' if cfg['model']['fuse_conv'] else '')
 
 # Validation set length
 VAL_LEN = 10000
@@ -48,6 +52,7 @@ net = get_network(model_type=cfg['model']['type'],
                 backbone=cfg['model']['name'],
                 dataset=cfg['misc']['dataset'], 
                 device=device,
+                fuse_conv=cfg['model']['fuse_conv'],
                 activation=cfg['model']['routing_activation'])
 
 # Handle multi-gpu

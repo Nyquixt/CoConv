@@ -1,7 +1,8 @@
 model:
   type: "coconv" # ['cc', 'dycnn', 'coconv']
-  name: "alexnet"
-  num_experts: 4
+  name: "mobilenetv2"
+  num_experts: 2
+  fuse_conv: true
   routing_activation: "sigmoid"
 
 hyperparameters:

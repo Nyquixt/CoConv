@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
 
 __all__ = ['CoConv']
 
@@ -61,12 +60,13 @@ class route_func_single_scale(nn.Module):
         return attention
 
 class CoConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, deploy=False, activation='sigmoid'):
+    def __init__(self, in_channels, out_channels, kernel_size, num_experts=3, stride=1, padding=0, groups=1, reduction=16, bias=False, fuse_conv=False, activation='sigmoid'):
         super().__init__()
-        self.deploy = deploy
+        self.fuse_conv = fuse_conv
         self.num_experts = num_experts
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.kernel_size = kernel_size
 
         self.stride = stride
         self.padding = padding
@@ -74,35 +74,38 @@ class CoConv(nn.Module):
 
         # routing function
         self.routing_func = route_func(in_channels, out_channels, num_experts, reduction, activation)
+        
+        if fuse_conv:
+            self.kernel_size = kernel_size
+            self.convs = nn.Parameter(torch.Tensor(num_experts, out_channels, in_channels, kernel_size, kernel_size)) # to count parameters during inference
 
-        # convs
-        if deploy: # for the purpose of testing inference time only. loading state_dict is not implemented
-            self.convs = [nn.Parameter(torch.Tensor(out_channels, in_channels // groups, kernel_size, kernel_size)) for i in range(num_experts)]
             if bias:
                 self.bias = nn.Parameter(torch.Tensor(num_experts, out_channels))
             else:
                 self.register_parameter('bias', None)
+            self.bns = nn.BatchNorm2d(out_channels)
         else:
             self.convs = nn.ModuleList([nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, groups=groups, bias=bias) for i in range(num_experts)])
             self.bns = nn.ModuleList([nn.BatchNorm2d(out_channels) for i in range(num_experts)])
 
     def forward(self, x):
         routing_weight = self.routing_func(x) # N x k*C
-        if self.deploy:
-            routing_weight = self.routing_func(x) # N x k*C
-            combined_weight = torch.zeros(*self.convs[0].size())
-            for i in range(self.num_experts):
-                route = torch.sum(routing_weight[:, i * self.out_channels : (i+1) * self.out_channels], dim=0)
-                combined_weight += self.convs[i] * route.unsqueeze(-1).expand_as(self.convs[i])
-            
+        if self.fuse_conv:
+            routing_weight = routing_weight.view(-1, self.num_experts, self.out_channels).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
+            b, c_in, h, w = x.size()
+            x = x.view(1, -1, h, w)
+            weight = self.convs.unsqueeze(0)
+            combined_weight = (weight * routing_weight).view(self.num_experts, b*self.out_channels, c_in, self.kernel_size, self.kernel_size)
+            combined_weight = torch.sum(combined_weight, dim=0)
             if self.bias is not None:
                 combined_bias = routing_weight.squeeze(-1).squeeze(-1).squeeze(-1).view(-1, self.num_experts * self.out_channels) * self.bias.view(-1).unsqueeze(0)
                 combined_bias = combined_bias.sum(1)
                 output = F.conv2d(x, weight=combined_weight, 
-                                stride=self.stride, padding=self.padding, groups=self.groups)
+                                stride=self.stride, padding=self.padding, groups=self.groups * b)
             else:
                 output = F.conv2d(x, weight=combined_weight,
-                                stride=self.stride, padding=self.padding, groups=self.groups)
+                                stride=self.stride, padding=self.padding, groups=self.groups * b)
+            output = self.bns(output.view(b, self.out_channels, output.size(-2), output.size(-1)))
         else:
             outputs = []
             for i in range(self.num_experts):
@@ -117,13 +120,13 @@ class CoConv(nn.Module):
 
 def test():
     x = torch.randn(64, 16, 32, 32)
-    conv = CoConv(16, 64, 3, padding=1, deploy=False)
+    conv = CoConv(16, 64, 3, padding=1, fuse_conv=False)
     y = conv(x)
     print(y.shape)
-    conv = CoConv(16, 64, 3, padding=1, deploy=True)
+    conv = CoConv(16, 64, 3, padding=1, fuse_conv=True)
     y = conv(x)
     print(y.shape)
-    conv = CoConv(16, 64, 3, padding=1, deploy=True, bias=True)
+    conv = CoConv(16, 64, 3, padding=1, fuse_conv=True, bias=True)
     y = conv(x)
     print(y.shape)
 

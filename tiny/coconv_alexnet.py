@@ -7,24 +7,24 @@ __all__ = ['CoConv_AlexNet']
 
 class CoConv_AlexNet(nn.Module):
 
-    def __init__(self, num_classes=200, num_experts=3, activation='sigmoid'):
+    def __init__(self, num_classes=200, num_experts=3, fuse_conv=False, activation='sigmoid'):
         super().__init__()
         self.features = nn.Sequential(
-            CoConv(3, 64, kernel_size=3, stride=2, padding=1, num_experts=num_experts, activation=activation),
+            CoConv(3, 64, kernel_size=3, stride=2, padding=1, num_experts=num_experts, fuse_conv=fuse_conv, activation=activation),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2),
-            CoConv(64, 192, kernel_size=3, padding=1, num_experts=num_experts, activation=activation),
+            CoConv(64, 192, kernel_size=3, padding=1, num_experts=num_experts, fuse_conv=fuse_conv, activation=activation),
             nn.BatchNorm2d(192),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2),
-            CoConv(192, 384, kernel_size=3, padding=1, num_experts=num_experts, activation=activation),
+            CoConv(192, 384, kernel_size=3, padding=1, num_experts=num_experts, fuse_conv=fuse_conv, activation=activation),
             nn.BatchNorm2d(384),
             nn.ReLU(inplace=True),
-            CoConv(384, 256, kernel_size=3, padding=1, num_experts=num_experts, activation=activation),
+            CoConv(384, 256, kernel_size=3, padding=1, num_experts=num_experts, fuse_conv=fuse_conv, activation=activation),
             nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
-            CoConv(256, 256, kernel_size=3, padding=1, num_experts=num_experts, activation=activation),
+            CoConv(256, 256, kernel_size=3, padding=1, num_experts=num_experts, fuse_conv=fuse_conv, activation=activation),
             nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2),

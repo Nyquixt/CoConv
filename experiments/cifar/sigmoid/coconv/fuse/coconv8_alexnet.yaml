@@ -2,6 +2,7 @@ model:
   type: "coconv" # ['cc', 'dycnn', 'coconv']
   name: "alexnet"
   num_experts: 8
+  fuse_conv: true
   routing_activation: "sigmoid"
 
 hyperparameters:
