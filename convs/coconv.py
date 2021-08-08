@@ -29,8 +29,8 @@ class route_func(nn.Module):
         if self.activation == 'sigmoid':
             self.activation_func = nn.Sigmoid()
         else:
-            # self.temperature = 30
-            self.activation_func = nn.Softmax(1)
+            self.temperature = 16
+            self.activation_func = nn.Softmax(2)
 
     def forward(self, x):
         b, _, _, _ = x.size()
@@ -42,7 +42,7 @@ class route_func(nn.Module):
             attention = self.activation_func(self.dwise_separable(attention))
         else:
             attention = self.dwise_separable(attention).view(b, self.num_experts, self.out_channels)
-            attention = self.activation_func(attention).view(b, -1, 1, 1)
+            attention = self.activation_func(attention * self.temperature).view(b, -1, 1, 1)
         return attention
 
 class route_func_single_scale(nn.Module):
@@ -143,4 +143,4 @@ def test():
     y = conv(x)
     print(y.shape)
 
-# test()
+test()
