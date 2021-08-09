@@ -88,9 +88,9 @@ class CoConv(nn.Module):
         
         if fuse_conv:
             self.kernel_size = kernel_size
-            self.convs = nn.Parameter(torch.Tensor(num_experts, out_channels, in_channels, kernel_size, kernel_size)) # to count parameters during inference
+            self.convs = nn.Parameter(torch.Tensor(num_experts, out_channels, in_channels // groups, kernel_size, kernel_size)) # to count parameters during inference
             nn.init.kaiming_uniform_(self.convs, a=math.sqrt(5))
-            
+
             if bias:
                 self.bias = nn.Parameter(torch.Tensor(num_experts, out_channels))
             else:
