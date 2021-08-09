@@ -105,6 +105,8 @@ venv.bak/
 
 mmdet/version.py
 data/
+trained_nets/
+logs/
 .vscode
 .idea
 .DS_Store
