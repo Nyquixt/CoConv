@@ -24,12 +24,11 @@ else:
     network_name = cfg['model']['type'] + str(cfg['model']['num_experts']) + '_' + cfg['model']['name']
 # Files to record stuff to
 RESULT_FILE = 'results.txt'
-LOG_FILE = 'logs/{}-{}-b{}-e{}-{}-{}.txt'.format(network_name, 
+LOG_FILE = 'logs/{}-{}-b{}-e{}-{}.txt'.format(network_name, 
                                 cfg['misc']['dataset'], 
                                 cfg['hyperparameters']['batch'], 
                                 cfg['hyperparameters']['epochs'],
-                                cfg['model']['routing_activation'],
-                                'fuse' if cfg['model']['fuse_conv'] else '')
+                                cfg['model']['routing_activation'])
 
 # Validation set length
 VAL_LEN = 10000
@@ -107,13 +106,12 @@ if cfg['track']['resume']:
     start_epoch = state['epoch']
     stats = state['stats'] if state['stats'] else { 'best_acc': 0.0, 'best_epoch': 0 }
 else: # Train a new model from random initialization
-    checkpoint_path = 'trained_nets/{}-{}-b{}-e{}-{}-{}.tar' \
+    checkpoint_path = 'trained_nets/{}-{}-b{}-e{}-{}.tar' \
                                 .format(network_name, 
                                 cfg['misc']['dataset'], 
                                 cfg['hyperparameters']['batch'], 
                                 cfg['hyperparameters']['epochs'],
-                                cfg['model']['routing_activation'],
-                                'fuse' if cfg['model']['fuse_conv'] else '')
+                                cfg['model']['routing_activation'])
     start_epoch = 0
 
 # Train the model

@@ -107,6 +107,7 @@ mmdet/version.py
 data/
 trained_nets/
 logs/
+analysis/
 .vscode
 .idea
 .DS_Store
