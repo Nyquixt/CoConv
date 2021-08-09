@@ -17,7 +17,7 @@ hyperparameters:
 misc:
   dataset: "cifar100"
   cuda: true
-  ngpu: 2
+  ngpu: 3
 
 track:
   save: true

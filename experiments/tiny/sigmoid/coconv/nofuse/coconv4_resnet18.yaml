@@ -17,7 +17,7 @@ hyperparameters:
 misc:
   dataset: "tiny"
   cuda: true
-  ngpu: 2
+  ngpu: 3
 
 track:
   save: true
