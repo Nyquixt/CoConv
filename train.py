@@ -107,10 +107,13 @@ if cfg['track']['resume']:
     start_epoch = state['epoch']
     stats = state['stats'] if state['stats'] else { 'best_acc': 0.0, 'best_epoch': 0 }
 else: # Train a new model from random initialization
-    checkpoint_path = 'trained_nets/{}-{}-b{}-e{}.tar'.format(
-                network_name, cfg['misc']['dataset'], 
-                cfg['hyperparameters']['batch'], 
-                cfg['hyperparameters']['epochs'])
+    checkpoint_path = 'trained_nets/{}-{}-b{}-e{}-{}-{}.tar' \
+                                .format(network_name, 
+                                cfg['misc']['dataset'], 
+                                cfg['hyperparameters']['batch'], 
+                                cfg['hyperparameters']['epochs'],
+                                cfg['model']['routing_activation'],
+                                'fuse' if cfg['model']['fuse_conv'] else '')
     start_epoch = 0
 
 # Train the model
