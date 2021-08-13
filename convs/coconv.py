@@ -107,7 +107,8 @@ class CoConv(nn.Module):
             b, c_in, h, w = x.size()
             x = x.view(1, -1, h, w)
             weight = self.convs.unsqueeze(0)
-            combined_weight = (weight * routing_weight).view(self.num_experts, b*self.out_channels, c_in, self.kernel_size, self.kernel_size)
+            
+            combined_weight = (weight * routing_weight).view(self.num_experts, b*self.out_channels, c_in // self.groups, self.kernel_size, self.kernel_size)
             combined_weight = torch.sum(combined_weight, dim=0)
             if self.bias is not None:
                 combined_bias = routing_weight.squeeze(-1).squeeze(-1).squeeze(-1).view(-1, self.num_experts * self.out_channels) * self.bias.view(-1).unsqueeze(0)
