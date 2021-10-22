@@ -123,3 +123,6 @@ work_dirs/
 *.py~
 *.sh~
 .vscode/
+
+*.tar
+results/

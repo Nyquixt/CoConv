@@ -21,7 +21,7 @@ from torch.autograd import Variable
 from torchvision import transforms
 import sys
 sys.path.append('../')
-import models as models
+import imagenet.models as models
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -103,7 +103,7 @@ def save_gradcam(filename, gcam, raw_image, paper_cmap=False):
         alpha = gcam[..., None]
         gcam = alpha * cmap + (1 - alpha) * raw_image
     else:
-        gcam = (cmap.astype(np.float) + raw_image.astype(np.float)) / 2
+        gcam = (cmap.astype(np.float64) + raw_image.astype(np.float64)) / 2
     cv2.imwrite(filename, np.uint8(gcam))
 
 
@@ -127,8 +127,8 @@ def main(ctx):
 @main.command()
 @click.option("-i", "--image-paths", default={'dog.jpeg'}, type=str, multiple=True, required=True)
 @click.option("-a", "--arch", default="coopconv_resnet18", type=click.Choice(model_names), required=True)
-@click.option("-c", "--checkpoint", default="/home/g1007540910/Dynamic-Conv/checkpoints/imagenet/", type=str, required=True)
-@click.option("-t", "--target-layer", default="layer4.1.conv1", type=str, required=True)
+@click.option("-c", "--checkpoint", default="/home/kien/Desktop/CoConv/imagenet/", type=str, required=True)
+@click.option("-t", "--target-layer", default="layer4.1.conv2.conv3", type=str, required=True)
 @click.option("-k", "--topk", type=int, default=1)
 @click.option("-d", "--distribute", type=int, default=1)
 @click.option("-o", "--output-dir", type=str, default="./results")
@@ -147,13 +147,13 @@ def demo1(image_paths, target_layer, arch, topk, output_dir, cuda,checkpoint,dis
     model = models.__dict__[arch]()
     model = model.cuda()
     # print(model)
-    checkpoint = checkpoint+arch+'/model_best.pth.tar'
+    checkpoint = checkpoint + 'model_best.pth.tar'
     # print(checkpoint)
     check_point = torch.load(checkpoint, map_location=lambda storage, loc: storage.cuda(0))
 
     distributed_model = (distribute>0.5)
     only_CAM=True
-
+    # print(check_point['state_dict'].keys())
     if distributed_model ==True:
         # create new OrderedDict that does not contain `module.`
         from collections import OrderedDict
